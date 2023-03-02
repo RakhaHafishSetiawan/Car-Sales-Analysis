@@ -10,3 +10,9 @@ This project is based on the Electric Car Sales in the USA data set. This reposi
 • R Programming Language <br>
 • Microsoft Power BI <br>
 • Microsoft Excel 
+ 
+ ## Link to My Kaggle R Notebook
+ [Rakha Hafish Setiawan](https://www.kaggle.com/code/rakhahafishsetiawan/car-sales-analysis?scriptVersionId=120799397)
+ 
+ ## Creator 
+ Rakha Hafish Setiawan
