@@ -5,17 +5,22 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-```{r echo = FALSE, include = FALSE}
+```{r echo = FALSE, include = FALSE, message=FALSE}
 library(tidyverse)
-library(skimr)
 library(writexl)
+library(sqldf)
+MyCars = readxl::read_excel("C:/Users/Rakha Hafish S/Downloads/Electric Car Sales by Model in USA.xlsx")
 ```
 
 ```{r}
-MyCars = readxl::read_excel("C:/Users/Rakha Hafish S/Downloads/Electric Car Sales by Model in USA.xlsx")
+MyCarsTemp = MyCars %>%
+  select(everything(), -3) %>%
+  gather(Date, Sales, 3:98) %>%
+  mutate(Sales = ifelse(is.na(Sales), 0, Sales))
+```
 
+```{r}
 MyDates = MyCars %>%
-  drop_na() %>%
   select(everything()) %>%
   gather(Dates, Sales, 4:99) %>%
   select(Dates) %>%
@@ -23,17 +28,14 @@ MyDates = MyCars %>%
   data.frame() %>%
   apply(2, FUN = str_remove_all, "-") %>%
   data.frame() %>%
-  apply(2, FUN = str_to_title) 
+  apply(2, FUN = str_to_title) %>%
+  data.frame() 
 ```
 
 ```{r}
-# writexl::write_xlsx("C://Users//Rakha Hafish S//Desktop//CarSales2.xlsx")
-MyCars2 = MyCars %>%
-  drop_na() %>%
-  select(everything()) %>%
-  gather(Dates, Sales, 4:99) %>%
-  select(-Dates) %>%
+CarsFixed = MyCarsTemp %>%
   bind_cols(MyDates) %>%
+  select(Make, Model, Dates, Sales) %>%
   mutate(Year = if_else(grepl("12", Dates), 2012,
                 if_else(grepl("13", Dates), 2013,
                 if_else(grepl("14", Dates), 2014,
@@ -41,6 +43,17 @@ MyCars2 = MyCars %>%
                 if_else(grepl("16", Dates), 2016,
                 if_else(grepl("17", Dates), 2017,
                 if_else(grepl("18", Dates), 2018, 2019)))))))) %>%
-  select(everything(), - Dates) 
+  select(Make, Model, Year, Sales) %>%
+  write.csv("C://Users//Rakha Hafish S//Desktop//Personal Projects//CarSales.csv")
 ```
+
+```{r}
+sqldf::sqldf("SELECT Make,
+             MAX(Sales) FROM CarsFixed 
+             GROUP BY Make
+             ORDER BY MAX(Sales) DESC")
+```
+
+
+
 
